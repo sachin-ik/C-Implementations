@@ -25,6 +25,11 @@ void printList(timer* baseTimer)
 void addTimer(timer* baseTimer, int delay)
 {
 	timer* newTimer = (timer*)malloc(sizeof(timer));
+	if(newTimer == NULL)		//check if memory is allocated
+	{
+		printf("Memory allocation failed\n");
+		return;
+	}
 	timer* next = baseTimer->next;
 	while(delay > next->waitTime)
 	{
@@ -51,6 +56,7 @@ void removeTimer(timer* baseTimer)
 		{
 			next->prev->next = next->next;	//remove the timer from the list	
 			next->next->prev = next->prev;
+			free(next);						//free the memory
 		}
 		else
 		{
@@ -84,23 +90,31 @@ void decTimer(timer* baseTimer,int value)
 int main(int argc, char **argv)
 {
 	timer* baseTimer = (timer*)malloc(sizeof(timer));		//create base timer
+	printf("Initialize base timer\n");
 	baseTimer->waitTime = 10000;							//initialize base Timer value
 	baseTimer->next = baseTimer;
 	baseTimer->prev = baseTimer;
 	
 	printList(baseTimer);									//base<-base->base
+	printf("Add timer1 with delay 2000\n");
 	addTimer(baseTimer,2000);								
 	printList(baseTimer);									//base->timer1
+	printf("Add timer2 with delay 500\n");
 	addTimer(baseTimer,500);
 	printList(baseTimer);									//base->timer1->timer2
+	printf("Decrement timer with 500\n");
 	decTimer(baseTimer,500);	//decrement 500			
 	printList(baseTimer);									//base->timer1
+	printf("Add timer3 with delay 2000\n");
 	addTimer(baseTimer,2000);
 	printList(baseTimer);									//base->timer1->timer3
+	printf("Add timer4 with delay 3000\n");
 	addTimer(baseTimer,3000);
 	printList(baseTimer);									//base->timer1->timer3->timer4
+	printf("Decrement timer with 1000\n");
 	decTimer(baseTimer,1000); //decrement 1000
 	printList(baseTimer);									//base->timer1->timer3->timer4
+	printf("Add timer5 with delay 3000\n");
 	addTimer(baseTimer,3000);
 	printList(baseTimer);									//base->timer1->timer3->timer4->timer5
 	return 0;
