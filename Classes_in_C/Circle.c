@@ -6,7 +6,7 @@ void Circle_ctor(Circle * const me, int x, int y, int radius) {
     };
 
     Shape_ctor(&me->super, x, y); // call super constructor so that x and y are initialized
-    me->super.vptr = &vtbl;
+    me->super.vptr = &vtbl; //adjust the vptr
     me->radius = radius;
 }
 

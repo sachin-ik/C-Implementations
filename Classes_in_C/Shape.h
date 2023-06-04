@@ -23,6 +23,10 @@ struct ShapeVtbl {
 
 //virtual call (late binding/runtime binding/dynamic binding)
 static inline int Shape_area_vcall(Shape const * const me) {
+    //Here the objects points to corresponding area function of the derived class
+    //Ex: When &R1 is passed to Shape_area_vcall, it points to Rectangle_area function
+    //    When &C1 is passed to Shape_area_vcall, it points to Circle_area function
+    //    When &S1 is passed to Shape_area_vcall, it points to Shape_area function
     return (*me->vptr->area)(me); //(*me->vptr->area) is a function pointer
 }
 
