@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 struct timer
 {
 	int waitTime;
@@ -7,6 +8,26 @@ struct timer
 	struct timer* prev;
 };
 typedef struct timer timer;
+
+// struct u64Timer{
+// 	uint32_t low32;
+// 	uint32_t high32;
+// };
+// typedef struct u64Timer u64Timer;
+
+// void decTimer(timer* t1){
+// 	if(t1->low32 < t1->low32-1){
+// 		if(t1->high32 > 0)t1->high32--;	
+// 	}
+// 	t1->low32 = t1->low32-1;
+// }
+
+// void incTimer(timer* t1){
+// 	if(t1->low32 > t1->low32+1){
+// 		t1->high32++;	
+// 	}
+// 	t1->low32++;
+// }
 
 void printList(timer* baseTimer)
 {
@@ -100,7 +121,7 @@ int main(int argc, char **argv)
 	addTimer(baseTimer,2000);								
 	printList(baseTimer);									//base->timer1
 	printf("Add timer2 with delay 500\n");
-	addTimer(baseTimer,500);
+	addTimer(baseTimer,2500);
 	printList(baseTimer);									//base->timer1->timer2
 	printf("Decrement timer with 500\n");
 	decTimer(baseTimer,500);	//decrement 500			

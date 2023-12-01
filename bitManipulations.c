@@ -4,6 +4,27 @@
 const int i = 1;
 #define is_bigendian() ((*((char*)(&i))) == 0)
 #define my_sizeof(type) ((char*)(&type+1) - (char*)(&type))
+
+#define get_bits(num, start_bit, width) ((num >> start_bit) & ((1<<width)-1))
+// int get_bits(int num, int start_bit, int width){
+//     int mask = (1<<width)-1;
+//     return ((num>>start_bit) & mask);
+// } 
+
+int clear_bits(int num, int n){
+    //first n bits cleared here from msb
+    return num & ((1<<(32-n))-1);
+}
+
+int clear_bits_lsb(int num, int n){
+    //ex: num = 0x1234 n = 2
+    // 0x1234567 & ~((1 << 2)-1)
+    // 0x1234567 & ~(0b11)
+    // 0x1234567 & 0b111111....00
+    // 0x1234564 // last 2 bits cleared
+    return num & ~((1<<(n))-1);
+}
+
 int sys_byte_size(void)
 {
     long a = 0;
@@ -53,7 +74,8 @@ int count_set_bits(unsigned int num)
     // 5 = 0b101 -> (6 & 5) = 0b100 = 4
     // 4 = 0b100 -> (4 & 3) = 0b000 = 0
     //uses only the number of set bits iterations
-    while(num & (num-1)){
+    while(num){
+        num = num & (num-1);
         count++;
     }
     return count;
@@ -127,6 +149,12 @@ void reverse_bits2(unsigned int* num)
 //reverse bits in optimized way
 void reverse_bits3(unsigned int* num)
 {
+    // *num = (*num & 0x55555555) << 1 | (*num & 0xaaaaaaaa) >> 1;
+    // *num = (*num & 0x33333333) << 2 | (*num & 0xcccccccc) >> 2;
+    // *num = (*num & 0x0f0f0f0f) << 4 | (*num & 0xf0f0f0f0) >> 4;
+    // *num = (*num & 0x00ff00ff) << 8 | (*num & 0xff00ff00) >> 8;
+    // *num = (*num & 0x0000ffff) << 16 | (*num & 0xffff0000) >> 16;
+
     *num = (*num & 0x55555555) << 1 | (*num & 0xaaaaaaaa) >> 1;
     *num = (*num & 0x33333333) << 2 | (*num & 0xcccccccc) >> 2;
     *num = (*num & 0x0f0f0f0f) << 4 | (*num & 0xf0f0f0f0) >> 4;
@@ -158,15 +186,26 @@ int main()
     printf("my_sizeof(float): %d\n",my_sizeof(c));
     printf("my_sizeof(double): %d\n",my_sizeof(d));
 
-    unsigned int num = 0xcccccccc;
+    unsigned int num = 0x12345678;
     print_binary(num);
-    reverse_bits3(&num);
+    int g = get_bits(num, 6, 4);
+    printf("get bits from start_idx with width: 0x%x\n", g);
+    printf("clear bits from msb: 0x%x\n", clear_bits(num, 2));
+    num = 0x0000ffff;
+    print_binary(num);
+    printf("Before reverse: \n");
     print_hex(num);
+    reverse_bits3(&num);
+    printf("After reverse: \n");
+    print_hex(num);
+
+    printf("count set bits : %d\n", count_set_bits(num));
     
     int x = 10;
     int y = 20;
+    printf("Before swap x: %d, y: %d\n",x,y);
     swap(&x, &y);
-    printf("x: %d, y: %d\n",x,y);
+    printf("After swap x: %d, y: %d\n",x,y);
     
     
     return 0;

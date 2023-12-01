@@ -4,10 +4,30 @@
 #include "Shape.h"
 #include "Rectangle.h"
 #include "Circle.h"
+#include "Queue.h"
+#include "ActiveObject.h"
 
 Shape s1;
 Rectangle r1;
 Circle c1;
+
+
+void aoThreadFunction(ActiveObject * const me)
+{
+    //Active object thread should be of infinite loop
+    //so that it can process the requests continuously
+
+    //But in this example we are not using infinite loop to avoid blocking the main thread
+    //while(1)
+    {
+        while(!Queue_isEmpty(me->aoQueue))
+        {
+            void *request = Queue_dequeue(me->aoQueue);
+            printf("Request: %d\n", *(int *)request);
+            free(request);
+        }
+    }
+}
 
 int main()
 {
@@ -43,5 +63,33 @@ int main()
     
     area_shape(arr);
 
+    /*Testing queues*/
+    Queue* queue = Queue_create(10);
+    int i;
+    for(i=0;i<10;i++)
+    {
+        Queue_enqueue(queue, &i);
+    }
+
+    for(i=0;i<10;i++)
+    {
+        printf("Dequeued: %d\n", *(unsigned int*)Queue_dequeue(queue));
+    }
+
+    Queue_destroy(queue);
+    //***********************//
+
+    /*Test active objects*/
+    //create a active object
+    ActiveObject* ao = ActiveObject_constructor(&aoThreadFunction, 10);
+    
+    for(i=0;i<10;i++)
+    {
+        int *request = (int *)malloc(sizeof(int));
+        *request = i;
+        ActiveObject_enqueue(ao, request);
+    }
+    ActiveObject_start(ao);
+    ActiveObject_destructor(ao);
     return 0;
 }
